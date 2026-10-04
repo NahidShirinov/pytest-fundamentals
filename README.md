@@ -68,9 +68,17 @@ python3 -m venv .venv && .venv/bin/pip install pytest
 
 ---
 
-## Özün yoxla (əlavə tasklar)
+## Əlavə tasklar (həlli: `tests/test_09_extra.py`, `tests/test_10_session.py`)
 1. `BankAccount.deposit(-10)` `ValueError` atdığını test et.
 2. `divide()` üçün 5 halı parametrize et (mənfi, float, böyük ədədlər).
 3. `scope="session"` fixture yaz və bir neçə faylda istifadə et.
 4. `monkeypatch.setattr` ilə `app.utils.get_env_mode`-u əvəz edib test yaz.
 5. Parametrize + fixture birləşdir: müxtəlif başlanğıc balanslarla hesab yarat.
+
+### Əlavə taskların izahı
+1. **Mənfi deposit** — `pytest.raises(ValueError)` + xətadan sonra balansın dəyişmədiyini yoxlayırıq.
+2. **divide() 5 hal** — `parametrize` + `ids`; float nəticələr üçün `pytest.approx`.
+3. **Session fixture** — `conftest.py`-da `scope="session"`; iki fərqli faylda istifadə olunur, `SESSION_CALLS` sayğacı 1 dəfə yaradıldığını sübut edir.
+4. **monkeypatch.setattr** — `monkeypatch.setattr(utils, "get_env_mode", lambda: "mocked")`. Növbəti test orijinalın bərpa olunduğunu yoxlayır.
+   ⚠️ Patch-i funksiyanın **istifadə olunduğu** modulda et: `from app.utils import get_env_mode` ilə import edilmiş kopyaya `app.utils` üzərindən etdiyin patch təsir etmir.
+5. **Parametrize olunmuş fixture** — `@pytest.fixture(params=[0, 50, 1000])` + `request.param`. Bu fixture-u istifadə edən hər test 3 dəfə işləyir.
